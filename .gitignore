@@ -1,0 +1,42 @@
+# Maven build outputs
+**/target/
+*.class
+*.log
+*.iml
+
+# IDE configurations
+.idea/
+.vscode/
+*.code-workspace
+.classpath
+.project
+.settings/
+
+# OS-specific files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Secrets and private configurations
+**/*.pem
+**/*.key
+.env
+**/application.properties
+**/api.log
+**/query.sql
+**/public-block.json
+**/policy.json
+**/website.json
+
+# Local storage and backup zips
+**/data/s3-sim/
+**/*.scf
+**/*.zip
+
+# Temporary test outputs and assets
+decrypted_*
+*.bin
+*.sck
+
+# External dependencies and tools
+**/tools/

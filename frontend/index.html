@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="SecureCrypt - Client-side zero-knowledge file encryption platform using AES-256-GCM. Encrypt and decrypt files locally in your browser. Passwords and keys never leave your machine.">
+    <title>SecureCrypt - Client-Side Zero-Knowledge Encryption</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Semantic Navigation Header -->
+    <header id="appHeader">
+        <div class="logo" id="appLogo">
+            <img src="assets/logo.png" alt="Logo" class="logo-img" id="logoImg">
+            <span>SecureCrypt</span>
+        </div>
+        <nav id="appNavigation">
+            <ul>
+                <li><a href="#" class="nav-link active" id="navHome" data-target="homeView">Home</a></li>
+                <li><a href="#" class="nav-link" id="navEncrypt" data-target="encryptView">Encrypt</a></li>
+                <li><a href="#" class="nav-link" id="navDecrypt" data-target="decryptView">Decrypt</a></li>
+                <li><a href="#" class="nav-link" id="navCloud" data-target="cloudView">Cloud Files</a></li>
+                <li><a href="#" class="nav-link" id="navAbout" data-target="aboutView">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <main id="appMain">
+
+        <!-- 1. HOME / LANDING PAGE VIEW -->
+        <div id="homeView" class="page-view">
+            <section class="hero" id="homeHero">
+                <span class="badge" id="homeBadge">Secure Cryptography Platform</span>
+                <h1>Zero-Knowledge File Security</h1>
+                <p>Protect your files using client-side AES-256-GCM authenticated encryption. Your keys and passwords
+                    never leave your device.</p>
+
+                <div style="display: flex; gap: 16px; justify-content: center; margin-top: 32px;" id="heroActions">
+                    <button type="button" class="btn" style="width: auto; margin-top: 0; padding: 14px 32px;"
+                        id="heroEncryptBtn" data-target="encryptView">🔒 Encrypt File</button>
+                    <button type="button" class="btn btn-secondary" style="padding: 14px 32px;" id="heroDecryptBtn"
+                        data-target="decryptView">🔓 Decrypt File</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- 2. ENCRYPT VIEW -->
+        <div id="encryptView" class="page-view hidden">
+            <div class="app-grid">
+
+                <!-- Encrypt Config card -->
+                <section class="card card-encrypt" id="encryptCard">
+                    <h2 class="card-title" id="encryptTitle">
+                        <span class="card-title-icon">🔒</span>
+                        <span>Encrypt New File</span>
+                    </h2>
+
+                    <div class="toggle-group" id="encMethodToggle">
+                        <button type="button" class="toggle-btn active" data-method="password"
+                            id="encTogglePassword">Password</button>
+                        <button type="button" class="toggle-btn" data-method="key" id="encToggleKey">Key File</button>
+                    </div>
+
+                    <form id="encryptForm">
+                        <div class="form-group" id="encPasswordGroup">
+                            <label for="encPassword">Enter Encryption Password</label>
+                            <input type="password" id="encPassword" class="input-control"
+                                placeholder="Minimum 8 characters recommended" autocomplete="new-password">
+                        </div>
+
+                        <div class="form-group hidden" id="encKeyGroup">
+                            <label>AES-256 Key Management</label>
+                            <div class="key-container">
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Generate a
+                                    raw high-entropy 256-bit AES key. Download it as a `.sck` file and save it securely.
+                                </p>
+                                <button type="button" class="btn btn-secondary" id="generateKeyBtn">🔑 Generate Key
+                                    (.sck)</button>
+                                <div class="selected-file-info hidden" id="loadedKeyInfo">
+                                    <span style="color: #34d399;">✓ Key generated and loaded in browser memory</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Select Target File</label>
+                            <div class="dropzone" id="encDropzone">
+                                <div class="dropzone-icon">📁</div>
+                                <p>Drag and drop file here or click to browse</p>
+                                <span>Supports any local document, video, or binary format</span>
+                            </div>
+                            <input type="file" id="encFileInput" class="file-input">
+                            <div class="selected-file-info" id="encFileInfo">
+                                <span class="filename">No file selected</span>
+                                <span style="color: var(--accent-purple);">Selected</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 16px; margin-bottom: 24px;">
+                            <label class="checkbox-label"
+                                style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary); cursor: pointer;">
+                                <input type="checkbox" id="saveToCloudCheckbox"
+                                    style="accent-color: var(--accent-purple); width: 18px; height: 18px; margin-top: 1px;">
+                                <span>Save encrypted file metadata to cloud database</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn" id="encryptSubmitBtn">Encrypt & Download File (.scf)</button>
+                    </form>
+                </section>
+
+                <!-- Console log for encrypt operations -->
+                <section class="card" id="encryptConsoleCard">
+                    <h2 class="card-title" style="font-size: 18px;">
+                        <span>Terminal Output</span>
+                    </h2>
+                    <div class="console-title">
+                        <span>Encryption Operations Logs</span>
+                        <span class="console-clear" data-clear="encConsole">[Clear]</span>
+                    </div>
+                    <div class="console-panel" id="encConsole">
+                        <div class="log-entry info">[LOG] System ready. Select encryption options above.</div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- 3. DECRYPT VIEW -->
+        <div id="decryptView" class="page-view hidden">
+            <div class="app-grid">
+
+                <!-- Decrypt Config card -->
+                <section class="card card-decrypt" id="decryptCard">
+                    <h2 class="card-title" id="decryptTitle">
+                        <span class="card-title-icon">🔓</span>
+                        <span>Decrypt Encrypted File</span>
+                    </h2>
+
+                    <div class="toggle-group" id="decMethodToggle">
+                        <button type="button" class="toggle-btn active" data-method="password"
+                            id="decTogglePassword">Password</button>
+                        <button type="button" class="toggle-btn" data-method="key" id="decToggleKey">Key File</button>
+                    </div>
+
+                    <form id="decryptForm">
+                        <div class="form-group" id="decPasswordGroup">
+                            <label for="decPassword">Enter Decryption Password</label>
+                            <input type="password" id="decPassword" class="input-control"
+                                placeholder="Provide password used during encryption" autocomplete="current-password">
+                        </div>
+
+                        <div class="form-group hidden" id="decKeyGroup">
+                            <label>Upload Key File (.sck)</label>
+                            <div class="key-container">
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Upload the
+                                    corresponding 256-bit AES key file (.sck) generated during encryption.</p>
+                                <button type="button" class="btn btn-secondary" id="uploadKeyBtn">📂 Load Key
+                                    File</button>
+                                <input type="file" id="uploadKeyInput" class="file-input" accept=".sck">
+                                <div class="selected-file-info hidden" id="decKeyFileInfo">
+                                    <span class="key-filename">keyfile.sck</span>
+                                    <span style="color: var(--accent-cyan);">Loaded</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Select Encrypted File (.scf)</label>
+                            <div class="dropzone" id="decDropzone">
+                                <div class="dropzone-icon">🔒</div>
+                                <p>Drag and drop .scf file here or click to browse</p>
+                                <span>File must start with magic header 'SCRYPT'</span>
+                            </div>
+                            <input type="file" id="decFileInput" class="file-input" accept=".scf">
+                            <div class="selected-file-info" id="decFileInfo">
+                                <span class="filename">No file selected</span>
+                                <span style="color: var(--accent-cyan);">Selected</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn" id="decryptSubmitBtn">Decrypt & Download Plaintext</button>
+                    </form>
+                </section>
+
+                <!-- Console log for decrypt operations -->
+                <section class="card" id="decryptConsoleCard">
+                    <h2 class="card-title" style="font-size: 18px;">
+                        <span>Terminal Output</span>
+                    </h2>
+                    <div class="console-title">
+                        <span>Decryption Operations Logs</span>
+                        <span class="console-clear" data-clear="decConsole">[Clear]</span>
+                    </div>
+                    <div class="console-panel" id="decConsole">
+                        <div class="log-entry info">[LOG] System ready. Select decryption options above.</div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- 4. ABOUT VIEW (TECHNICAL DETAILS) -->
+        <div id="aboutView" class="page-view hidden">
+            <section class="card" id="aboutTechnicalInfo">
+                <h2 class="card-title" style="color: var(--accent-purple);">
+                    <span>📖 Cryptographic Specifications & Architecture</span>
+                </h2>
+                <div style="display: flex; flex-direction: column; gap: 24px;" id="aboutContent">
+
+                    <p style="font-size: 15px; color: var(--text-secondary);">SecureCrypt implements a zero-knowledge
+                        local-only cryptographic pipeline. Keys are derived and files encrypted locally inside the
+                        browser memory. Encrypted files can be securely shared with others or uploaded to AWS S3, while
+                        the server never holds the passwords or plaintext files.</p>
+
+                    <hr style="border: 0; border-top: 1px solid var(--glass-border);">
+
+                    <!-- Features Grid (Relocated from Home) -->
+                    <div style="margin-top: 20px;" id="featuresSection">
+                        <h3 style="font-size: 18px; margin-bottom: 24px; font-weight: 600;">Why SecureCrypt?</h3>
+                        <div class="app-grid" id="featuresGrid" style="margin-bottom: 24px;">
+
+                            <div class="card" id="featZeroKnowledge">
+                                <h4 class="card-title"
+                                    style="color: var(--accent-purple); font-size: 16px; margin-bottom: 12px;">
+                                    <span>🛡️ Zero-Knowledge Architecture</span>
+                                </h4>
+                                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">Decryption
+                                    occurs entirely inside the client browser. No plaintexts or keys are transmitted,
+                                    processed, or cached by servers, shielding your data from third-party exposure.</p>
+                            </div>
+
+                            <div class="card" id="featAesGcm">
+                                <h4 class="card-title"
+                                    style="color: var(--accent-cyan); font-size: 16px; margin-bottom: 12px;">
+                                    <span>⚡ Military-Grade AES-256-GCM</span>
+                                </h4>
+                                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">Using
+                                    Advanced Encryption Standard in Galois/Counter Mode ensures confidentiality and
+                                    cryptographic integrity validation (preventing file tampering attacks).</p>
+                            </div>
+
+                            <div class="card" id="featCrossDevice">
+                                <h4 class="card-title" style="color: #f43f5e; font-size: 16px; margin-bottom: 12px;">
+                                    <span>📱 Cross-Device Decryption</span>
+                                </h4>
+                                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">Files are
+                                    packaged into a custom binary format (`.scf`) that can be decrypted on any browser,
+                                    desktop device, or Java terminal without requiring external accounts.</p>
+                            </div>
+
+                            <div class="card" id="featKeyOptions">
+                                <h4 class="card-title" style="color: #eab308; font-size: 16px; margin-bottom: 12px;">
+                                    <span>🔑 Password & Key Options</span>
+                                </h4>
+                                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">Choose
+                                    password-based key derivation (using secure PBKDF2) for everyday ease of use, or raw
+                                    AES-256 key files (.sck) for advanced offline security workflows.</p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid var(--glass-border);">
+
+                    <div>
+                        <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">How It Works</h3>
+                        <ul
+                            style="list-style: square; padding-left: 20px; font-size: 14px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px;">
+                            <li><strong>Key Derivation (PBKDF2-HMAC-SHA256)</strong>: Converts user passwords into
+                                highly secure cryptographic keys using 65,536 iterations and a random 16-byte salt to
+                                prevent offline lookup and dictionary attacks.</li>
+                            <li><strong>Authenticated Encryption (AES-256-GCM)</strong>: Encrypts the raw file bytes
+                                using 256-bit Advanced Encryption Standard in Galois/Counter Mode. Galois Counter Mode
+                                adds an authenticating MAC tag to verify the file was not tampered with.</li>
+                            <li><strong>Random Initialization Vectors (IV)</strong>: A unique, cryptographically random
+                                12-byte IV is generated for each encryption operation to ensure that encrypting the same
+                                file twice results in entirely different ciphertexts.</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- 5. CLOUD FILES VIEW -->
+        <div id="cloudView" class="page-view hidden">
+            <!-- Authenticated dashboard -->
+            <div id="cloudDashboard" class="hidden">
+                <section class="card" style="margin-bottom: 24px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div>
+                            <h2 style="font-size: 20px; font-weight: 600;">☁️ Cloud Files Manager</h2>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Logged in as:
+                                <strong id="currentUserDisplay"
+                                    style="color: var(--accent-cyan); font-weight: 600;">-</strong>
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary"
+                            style="width: auto; margin-top: 0; padding: 8px 16px; font-size: 13px;" id="logoutBtn">🚪
+                            Logout</button>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h3 style="font-size: 16px; margin-bottom: 16px; font-weight: 600; color: var(--accent-purple);">
+                        Your Saved File Metadata</h3>
+                    <div class="table-container" style="overflow-x: auto; margin-top: 16px;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;"
+                            id="metadataTable">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--glass-border); color: var(--text-secondary);">
+                                    <th style="padding: 12px 10px; font-weight: 600;">Original Name</th>
+                                    <th style="padding: 12px 10px; font-weight: 600;">Size</th>
+                                    <th style="padding: 12px 10px; font-weight: 600;">Algorithm</th>
+                                    <th style="padding: 12px 10px; font-weight: 600;">Upload Date</th>
+                                    <th style="padding: 12px 10px; font-weight: 600; text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metadataList" style="color: var(--text-primary);">
+                                <!-- dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Non-authenticated portal -->
+            <div id="cloudPortal">
+                <div class="app-grid" style="grid-template-columns: 1fr;">
+                    <section class="card" style="max-width: 480px; margin: 40px auto; width: 100%;">
+                        <div style="text-align: center; margin-bottom: 28px;">
+                            <span
+                                style="font-size: 48px; filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.3));">☁️</span>
+                            <h2 style="font-size: 22px; margin-top: 16px; font-weight: 600;">Cloud Files Dashboard</h2>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Register or sign
+                                in to save and sync encrypted file metadata.</p>
+                        </div>
+
+                        <div class="toggle-group" id="authToggle" style="margin-bottom: 24px;">
+                            <button type="button" class="toggle-btn active" data-auth="login" id="authToggleLogin">Sign
+                                In</button>
+                            <button type="button" class="toggle-btn" data-auth="register"
+                                id="authToggleRegister">Register</button>
+                        </div>
+
+                        <form id="authForm">
+                            <div class="form-group">
+                                <label for="authUsername">Username</label>
+                                <input type="text" id="authUsername" class="input-control" required
+                                    placeholder="Enter username" autocomplete="username">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 24px;">
+                                <label for="authPassword">Password</label>
+                                <input type="password" id="authPassword" class="input-control" required
+                                    placeholder="Enter password" autocomplete="current-password">
+                            </div>
+                            <button type="submit" class="btn" id="authSubmitBtn">Sign In</button>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Semantic Footer -->
+    <footer id="appFooter">
+        <p>&copy;SecureCrypt Zero-Knowledge Project Deployed on AWS</p>
+        <p style="margin-top: 8px; color: var(--text-muted);"></p>
+    </footer>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+
+</html>
