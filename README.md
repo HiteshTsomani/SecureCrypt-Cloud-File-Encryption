@@ -2,6 +2,16 @@
 
 SecureCrypt is a professional, cloud-based file encryption platform that enables users to securely encrypt and decrypt files locally in their browser using strong cryptographic algorithms. Under its zero-knowledge design scheme, raw passwords and decryption keys never leave the client browser. Encrypted file binary blocks (GZIP compressed, AES-256-GCM encrypted) are stored in AWS S3, and metadata is persisted in an AWS RDS MySQL database.
 
+> [!IMPORTANT]
+> **Important Note for Live Demo**:
+> Since the frontend is hosted securely via HTTPS on Amazon S3 but connects to the backend API running on EC2 over HTTP (port 8080), modern browsers will block the API requests by default due to **Mixed Content restrictions**.
+> 
+> To allow the demo to connect and function properly:
+> 1. Click the **Connection Settings / Lock icon** immediately to the left of the URL in your browser's address bar.
+> 2. Select **Site settings**.
+> 3. Scroll down to **Insecure content** and change the option from *Block (default)* to **Allow**.
+> 4. Go back to the page, **refresh**, and proceed to register/log in!
+
 ---
 
 ## 🔒 Security Model (Zero-Knowledge)
