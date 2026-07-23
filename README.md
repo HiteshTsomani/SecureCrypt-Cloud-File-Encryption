@@ -45,13 +45,17 @@ graph TD
 
 ## 📸 Screenshots
 
-To populate your repository portfolio:
-1. Capture screenshots of your running app and place them inside the `frontend/assets/screenshots/` directory.
-2. Ensure they are named as follows:
-   - **Login Screen**: `login-page.png`
-   - **Dashboard**: `home-page.png`
-   - **Encrypt View**: `encrypt-page.png`
-   - **Decrypt View**: `decrypt-page.png`
+### 🏠 Home / Landing Page
+![Home View](frontend/assets/screenshots/home-page.png)
+
+### 🔒 Encrypt View (Local AES-256-GCM Encryption)
+![Encrypt View](frontend/assets/screenshots/encrypt-page.png)
+
+### 🔓 Decrypt View (GZIP & Web Crypto Decryption)
+![Decrypt View](frontend/assets/screenshots/decrypt-page.png)
+
+### ☁️ Cloud Files Dashboard (RDS & S3 Database Management)
+![Cloud Dashboard View](frontend/assets/screenshots/dashboard-page.png)
 
 ---
 
