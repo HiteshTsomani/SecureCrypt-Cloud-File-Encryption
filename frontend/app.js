@@ -51,7 +51,7 @@ let generatedKeyBytes = null; // Uint8Array for key-based encrypt
 let uploadedDecKeyBytes = null; // Uint8Array for key-based decrypt
 
 // Cloud State variables
-const BACKEND_URL = 'http://13.203.101.84:8080';
+const BACKEND_URL = 'http://YOUR_EC2_PUBLIC_IP:8080';
 let currentToken = localStorage.getItem('jwtToken') || null;
 let currentUsername = localStorage.getItem('jwtUsername') || null;
 let authMode = 'login'; // 'login' or 'register'
