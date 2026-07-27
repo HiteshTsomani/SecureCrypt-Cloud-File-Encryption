@@ -217,6 +217,15 @@ function setupDragAndDrop(dropzone, fileInput, fileInfoEl, isEncrypt) {
 }
 
 function handleFileSelection(file, fileInput, fileInfoEl, isEncrypt, consoleEl) {
+    if (isEncrypt && saveToCloudCheckbox.checked && file.size > 20 * 1024 * 1024) {
+        alert(`Files saved to the cloud cannot exceed 20 MB. "${file.name}" is ${formatBytes(file.size)}. Please uncheck 'Save encrypted file metadata to cloud database' to encrypt locally, or select a smaller file.`);
+        logConsole(consoleEl, `Error: Selected file is ${formatBytes(file.size)}, which exceeds the 20 MB limit for cloud storage.`, 'error');
+        fileInput.value = '';
+        fileInfoEl.classList.remove('active');
+        selectedEncFile = null;
+        return;
+    }
+
     if (isEncrypt) {
         selectedEncFile = file;
     } else {
@@ -336,6 +345,13 @@ uploadKeyInput.addEventListener('change', async (e) => {
     }
 });
 
+saveToCloudCheckbox.addEventListener('change', () => {
+    if (saveToCloudCheckbox.checked && selectedEncFile && selectedEncFile.size > 20 * 1024 * 1024) {
+        alert(`Files saved to the cloud cannot exceed 20 MB. "${selectedEncFile.name}" is ${formatBytes(selectedEncFile.size)}. Please select a smaller file, or encrypt locally without saving to the cloud.`);
+        saveToCloudCheckbox.checked = false;
+    }
+});
+
 // -------------------------------------------------------------
 // Encryption Action
 // -------------------------------------------------------------
@@ -344,6 +360,12 @@ encryptForm.addEventListener('submit', async (e) => {
     if (!selectedEncFile) {
         logConsole(encConsole, "Error: No file selected to encrypt.", "error");
         alert("Please select a file to encrypt first.");
+        return;
+    }
+
+    if (saveToCloudCheckbox.checked && selectedEncFile.size > 20 * 1024 * 1024) {
+        logConsole(encConsole, `Error: Selected file is ${formatBytes(selectedEncFile.size)}, which exceeds the 20 MB limit for cloud storage.`, "error");
+        alert("Files saved to the cloud cannot exceed 20 MB. Please uncheck 'Save encrypted file metadata to cloud database' to encrypt locally, or select a smaller file.");
         return;
     }
 
