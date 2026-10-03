@@ -311,8 +311,10 @@ generateKeyBtn.addEventListener('click', async () => {
         a.download = 'keyfile.sck';
         document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        setTimeout(() => {
+            if (document.body.contains(a)) document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 1000);
 
         logConsole(encConsole, "Downloaded key file: keyfile.sck", "success");
     } catch (e) {
@@ -451,31 +453,19 @@ encryptForm.addEventListener('submit', async (e) => {
             payloadBytes.set(ciphertextBytes, MAGIC_BYTES.length + 1 + IV_LENGTH);
         }
 
-        // Trigger Download
-        logConsole(encConsole, "Downloading encrypted file (.scf)...", "info");
-        const blob = new Blob([payloadBytes], { type: 'application/octet-stream' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = selectedEncFile.name + '.scf';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        const isCloudSave = saveToCloudCheckbox && saveToCloudCheckbox.checked;
 
-        logConsole(encConsole, "Encrypted file downloaded successfully!", "success");
-
-        // Cloud Metadata upload stage
-        if (saveToCloudCheckbox && saveToCloudCheckbox.checked) {
+        if (isCloudSave) {
+            // Cloud Metadata upload stage
             if (!currentToken) {
                 logConsole(encConsole, "Cloud Sync Warning: You must be logged in to save metadata. Redirecting to Cloud Files portal...", "warning");
-                alert("Please log in first to sync file metadata to the cloud.");
+                alert("Please log in or register in the Cloud Files portal first to save encrypted file metadata to the cloud database.");
                 navigateToView('cloudView');
                 updateCloudUI();
                 return;
             }
 
-            logConsole(encConsole, "Uploading encrypted binary to storage...", "info");
+            logConsole(encConsole, "Uploading encrypted binary and metadata to cloud database...", "info");
 
             const formData = new FormData();
             const encryptedFile = new File([payloadBytes], selectedEncFile.name + '.scf', { type: 'application/octet-stream' });
@@ -494,11 +484,34 @@ encryptForm.addEventListener('submit', async (e) => {
 
             if (response.ok) {
                 const resData = await response.json();
-                logConsole(encConsole, `Cloud Upload Success! File stored in storage (DB Record ID: ${resData.id}, Storage Key: ${resData.storageKey})`, "success");
+                logConsole(encConsole, `Cloud Upload Success! Saved to cloud database (Record ID: ${resData.id})`, "success");
+                alert(`File "${selectedEncFile.name}" successfully encrypted and saved to cloud database!`);
+                await fetchMetadataList();
+                navigateToView('cloudView');
+                updateCloudUI();
             } else {
                 const resErr = await response.json().catch(() => ({ error: 'Unknown server error' }));
                 logConsole(encConsole, `Cloud Upload Failure: ${resErr.error || 'Server error'}`, "error");
+                alert(`Cloud Save Failed: ${resErr.error || 'Server error'}`);
             }
+        } else {
+            // Local Browser Download Stage
+            logConsole(encConsole, "Downloading encrypted file (.scf)...", "info");
+            const blob = new Blob([payloadBytes], { type: 'application/x-securecrypt' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const finalFileName = selectedEncFile.name + '.scf';
+            a.setAttribute('download', finalFileName);
+            a.download = finalFileName;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                if (document.body.contains(a)) document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 5000);
+
+            logConsole(encConsole, "Encrypted file downloaded successfully!", "success");
         }
     } catch (err) {
         logConsole(encConsole, `Encryption failed: ${err.message}`, "error");
@@ -630,24 +643,17 @@ decryptForm.addEventListener('submit', async (e) => {
         if (cloudDecryptedBytesRef) {
             outputName = originalName; // Preserves the exact original filename from S3/Database metadata
         } else {
-            outputName = originalName;
-            if (outputName.toLowerCase().endsWith('.scf')) {
-                outputName = outputName.substring(0, outputName.length - 4);
-            } else {
+            outputName = selectedDecFile.name;
+            
+            // 1. Strip trailing .download or .scf extensions (case-insensitive)
+            outputName = outputName.replace(/(\.scf|\.download)+$/i, '');
+            
+            // 2. Strip duplicate counters like " (1)" if any
+            outputName = outputName.replace(/\s\(\d+\)$/i, '');
+
+            // 3. If no extension remains, prefix with decrypted_
+            if (!outputName.includes('.')) {
                 outputName = 'decrypted_' + outputName;
-            }
-
-            // Strip Chrome duplicate suffix (e.g. " (1)" or " (2)") added when files are downloaded multiple times
-            const duplicateMatch = outputName.match(/\s\(\d+\)$/);
-            if (duplicateMatch) {
-                outputName = outputName.substring(0, outputName.length - duplicateMatch[0].length);
-            }
-
-            // Smart-strip intermediate test flags (.password or .key) often added during test runs
-            if (outputName.toLowerCase().endsWith('.password')) {
-                outputName = outputName.substring(0, outputName.length - 9);
-            } else if (outputName.toLowerCase().endsWith('.key')) {
-                outputName = outputName.substring(0, outputName.length - 4);
             }
         }
 
@@ -659,8 +665,10 @@ decryptForm.addEventListener('submit', async (e) => {
         a.download = outputName;
         document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        setTimeout(() => {
+            if (document.body.contains(a)) document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 1000);
 
         logConsole(decConsole, `File downloaded: ${outputName} (${formatBytes(decompressedBytes.length)})`, "success");
 

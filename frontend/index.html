@@ -15,7 +15,7 @@
     <!-- Semantic Navigation Header -->
     <header id="appHeader">
         <div class="logo" id="appLogo">
-            <img src="assets/logo.png" alt="Logo" class="logo-img" id="logoImg">
+            <img src="logo.png" alt="Logo" class="logo-img" id="logoImg"> <!-- Your Image -->
             <span>SecureCrypt</span>
         </div>
         <nav id="appNavigation">
@@ -174,10 +174,10 @@
                             <label>Select Encrypted File (.scf)</label>
                             <div class="dropzone" id="decDropzone">
                                 <div class="dropzone-icon">🔒</div>
-                                <p>Drag and drop .scf file here or click to browse</p>
+                                <p>Drag and drop .scf or .download file here or click to browse</p>
                                 <span>File must start with magic header 'SCRYPT'</span>
                             </div>
-                            <input type="file" id="decFileInput" class="file-input" accept=".scf">
+                            <input type="file" id="decFileInput" class="file-input" accept=".scf,.download">
                             <div class="selected-file-info" id="decFileInfo">
                                 <span class="filename">No file selected</span>
                                 <span style="color: var(--accent-cyan);">Selected</span>
@@ -268,7 +268,7 @@
 
                     <hr style="border: 0; border-top: 1px solid var(--glass-border);">
 
-                    <div>
+                    <!--<div>
                         <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">How It Works</h3>
                         <ul
                             style="list-style: square; padding-left: 20px; font-size: 14px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px;">
@@ -282,7 +282,7 @@
                                 12-byte IV is generated for each encryption operation to ensure that encrypting the same
                                 file twice results in entirely different ciphertexts.</li>
                         </ul>
-                    </div>
+                    </div>-->
 
                 </div>
             </section>
@@ -372,8 +372,8 @@
 
     <!-- Semantic Footer -->
     <footer id="appFooter">
-        <p>&copy;SecureCrypt Zero-Knowledge Project Deployed on AWS</p>
-        <p style="margin-top: 8px; color: var(--text-muted);"></p>
+        <p>&copy; SecureCrypt Zero-Knowledge Project Developed on AWS.</p>
+
     </footer>
 
     <!-- App Logic -->
